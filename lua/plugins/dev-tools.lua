@@ -205,4 +205,35 @@ return {
       },
     },
   },
+  {
+    'folke/trouble.nvim',
+    dependencies = { 'nvim-tree/nvim-web-devicons' },
+    opts = {
+      focus = true,
+      win = {
+        type = 'split',
+        position = 'right',
+      },
+    },
+  },
+  {
+    'windwp/nvim-ts-autotag',
+    init = function()
+      require('nvim-ts-autotag').setup {
+        opts = {
+          enable_close = true,
+          enable_rename = true,
+          enable_close_on_slash = true,
+        },
+      }
+    end,
+  },
+  {
+    "saecki/live-rename.nvim",
+    init = function()
+      local live_rename = require("live-rename")
+      live_rename.setup()
+      vim.keymap.set("n", "<leader>R", live_rename.map({ insert = true }), { desc = "LSP rename" })
+    end
+  }
 }
