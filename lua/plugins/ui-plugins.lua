@@ -134,4 +134,17 @@ return {
   --     }
   --   end,
   -- },
+  {
+    'akinsho/toggleterm.nvim',
+    version = "*",
+    opts = {
+      open_mapping = [[<c-\>]],
+      autochdir = true,
+      direction = 'float',
+      float_opts = {
+        border = 'curved',
+        winblend = 0,
+      }
+    }
+  }
 }
