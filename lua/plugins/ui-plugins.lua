@@ -1,12 +1,48 @@
+local handler = function(virtText, lnum, endLnum, width, truncate)
+    local newVirtText = {}
+    local suffix = (' 󰁂 %d '):format(endLnum - lnum)
+    local sufWidth = vim.fn.strdisplaywidth(suffix)
+    local targetWidth = width - sufWidth
+    local curWidth = 0
+    for _, chunk in ipairs(virtText) do
+        local chunkText = chunk[1]
+        local chunkWidth = vim.fn.strdisplaywidth(chunkText)
+        if targetWidth > curWidth + chunkWidth then
+            table.insert(newVirtText, chunk)
+        else
+            chunkText = truncate(chunkText, targetWidth - curWidth)
+            local hlGroup = chunk[2]
+            table.insert(newVirtText, {chunkText, hlGroup})
+            chunkWidth = vim.fn.strdisplaywidth(chunkText)
+            -- str width returned from truncate() may less than 2nd argument, need padding
+            if curWidth + chunkWidth < targetWidth then
+                suffix = suffix .. (' '):rep(targetWidth - curWidth - chunkWidth)
+            end
+            break
+        end
+        curWidth = curWidth + chunkWidth
+    end
+    table.insert(newVirtText, {suffix, 'MoreMsg'})
+    return newVirtText
+end
+
 return {
   -- :Telescope colorscheme`.
+  -- {
+  --   'catppuccin/nvim',
+  --   name = 'catppuccin',
+  --   priority = 1000,
+  --   init = function()
+  --     vim.cmd.colorscheme 'catppuccin-macchiato'
+  --     vim.cmd.hi 'Comment gui=none'
+  --   end,
+  -- },
   {
-    'catppuccin/nvim',
-    name = 'catppuccin',
+    'EdenEast/nightfox.nvim',
+    name = 'nightfox',
     priority = 1000,
     init = function()
-      vim.cmd.colorscheme 'catppuccin-macchiato'
-      vim.cmd.hi 'Comment gui=none'
+      vim.cmd.colorscheme 'dayfox'
     end,
   },
   {
@@ -136,7 +172,7 @@ return {
   -- },
   {
     'akinsho/toggleterm.nvim',
-    version = "*",
+    version = '*',
     opts = {
       open_mapping = [[<c-\>]],
       autochdir = true,
@@ -144,7 +180,39 @@ return {
       float_opts = {
         border = 'curved',
         winblend = 0,
+      },
+    },
+  },
+  {
+    'kevinhwang91/nvim-ufo',
+    dependencies = {
+      'kevinhwang91/promise-async',
+    },
+    init = function()
+
+      -- vim.keymap.set('n', 'zR', require('ufo').openAllFold)
+      -- vim.keymap.set('n', 'zM', require('ufo').closeAllFold)
+
+      local capabilities = vim.lsp.protocol.make_client_capabilities()
+      capabilities.textDocument.foldingRange = {
+        dynamicRegistration = false,
+        lineFoldingOnly = true,
       }
-    }
-  }
+      local language_servers = require('lspconfig').util.available_servers()
+      for _, ls in ipairs(language_servers) do
+        require('lspconfig')[ls].setup {
+          capabilities = capabilities,
+        }
+      end
+      -- tresitter folds, I prefer LSP folds
+      -- require("ufo").setup({
+      --   provider_selector = function (bufnr, filetype, buftype)
+      --     return {'treesitter', 'indent'}
+      --   end
+      -- })
+      require('ufo').setup({
+        fold_virt_text_handler = handler
+      })
+    end,
+  },
 }
