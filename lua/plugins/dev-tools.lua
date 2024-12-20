@@ -212,7 +212,7 @@ return {
       focus = true,
       win = {
         type = 'split',
-        position = 'right',
+        position = 'bottom',
       },
     },
   },

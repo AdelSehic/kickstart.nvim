@@ -1,8 +1,4 @@
 return {
-  {
-    "nvim-telescope/telescope-file-browser.nvim",
-    dependencies = { "nvim-telescope/telescope.nvim", "nvim-lua/plenary.nvim" }
-  },
   { -- Fuzzy Finder (files, lsp, etc)
     'nvim-telescope/telescope.nvim',
     event = 'VimEnter',
@@ -17,7 +13,7 @@ return {
         end,
       },
       { 'nvim-telescope/telescope-ui-select.nvim' },
-
+      { 'nvim-telescope/telescope-file-browser.nvim' },
       -- Useful for getting pretty icons, but requires a Nerd Font.
       { 'nvim-tree/nvim-web-devicons', enabled = vim.g.have_nerd_font },
     },
@@ -37,7 +33,7 @@ return {
             require('telescope.themes').get_dropdown(),
           },
           file_browser = {
-            theme = "ivy",
+            theme = 'ivy',
           },
         },
       }
@@ -61,8 +57,8 @@ return {
       vim.keymap.set('n', '<leader><leader>', builtin.buffers, { desc = '[ ] Find existing buffers' })
 
       -- file browser extension
-      vim.keymap.set("n", "<space>fb", function ()
-        require("telescope").extensions.file_browser.file_browser()
+      vim.keymap.set('n', '<space>fb', function()
+        require('telescope').extensions.file_browser.file_browser()
       end)
 
       -- Slightly advanced example of overriding default behavior and theme
