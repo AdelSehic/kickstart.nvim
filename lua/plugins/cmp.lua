@@ -1,3 +1,5 @@
+return {}
+--[[
 return {
   { -- Autocompletion
     'hrsh7th/nvim-cmp',
@@ -108,3 +110,4 @@ return {
     end,
   },
 }
+--]]
