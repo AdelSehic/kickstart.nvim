@@ -1,3 +1,15 @@
+function ensure_dir_exists(path)
+    -- Check if directory exists
+    local f = io.open(path, "r")
+    if f == nil then
+        -- Create directory (cross-platform way)
+        os.execute("mkdir -p " .. path) -- For Unix-like systems
+        -- os.execute("mkdir " .. path) -- For Windows, may need adjustment
+    else
+        f:close()
+    end
+end
+
 return {
 
   -- debug.lua
@@ -160,7 +172,7 @@ return {
     main = 'nvim-treesitter.configs', -- Sets main module to use for opts
     -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
     opts = {
-      ensure_installed = { 'go', 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc' },
+      ensure_installed = { 'go', 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc', 'javascript' },
       -- Autoinstall languages that are not installed
       auto_install = true,
       highlight = {
@@ -252,6 +264,22 @@ return {
       vim.keymap.set("n", "<C-4>", function () harpoon:list():select(4) end)
     end
   },
+  {
+    "mbbill/undotree",
+    init = function ()
+      local undodir = vim.fn.expand("~/.undotree")
+      ensure_dir_exists(undodir)
+      vim.o.undodir = undodir
+      vim.o.undofile = true
+
+      vim.g.undotree_SetFocusWhenToggle = vim.g.undotree_SetFocusWhenToggle or 1
+
+      vim.keymap.set("n", "<leader>u", function ()
+        vim.cmd.UndotreeToggle()
+      end)
+    end
+  },
+
   vim.diagnostic.config({
     virtual_text = {
       enabled = true,

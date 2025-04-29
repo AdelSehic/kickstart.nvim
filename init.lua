@@ -1,5 +1,6 @@
 require 'opts'
 require 'binds'
+require 'user_commands'
 
 vim.g.have_nerd_font = true
 
