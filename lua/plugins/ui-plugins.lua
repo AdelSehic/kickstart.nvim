@@ -98,7 +98,7 @@ return {
     event = 'User BaseDefered',
     opts = {
       input = { default_prompt = '➤ ' },
-      select = { backend = { 'telescope', 'builtin' } },
+      select = { backend = { 'fzf_lua', 'builtin' } },
     },
   },
   -- lazy.nvim
