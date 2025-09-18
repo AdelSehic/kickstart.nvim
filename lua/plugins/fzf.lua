@@ -9,6 +9,7 @@ return {
     config = function()
       local fzf = require 'fzf-lua'
 
+      -- File searches
       vim.keymap.set('n', '<leader>sf', fzf.files,            { desc = "[S]earch [F]iles" })
       vim.keymap.set('n', '<leader>fh', fzf.oldfiles,         { desc = "[F]ile [H]istory" })
       vim.keymap.set('n', '<leader>sr', fzf.resume,           { desc = "[S]earch [R]esume" })
@@ -17,7 +18,11 @@ return {
       vim.keymap.set('n', '<leader>sg', fzf.live_grep_native, { desc = "[S]earch [G]REP" })
       vim.keymap.set('n', '<leader>sb', fzf.lgrep_curbuf,     { desc = "[S]earch [B]uffer" })
       vim.keymap.set('n', '<leader>sw', fzf.grep_cword,       { desc = "[S]earch [W]ord" })
-      vim.keymap.set('n', '<leader>gd', fzf.grep_cword,       { desc = "[S]earch [G]it [D]iff" })
+
+      -- Git
+      vim.keymap.set('n', '<leader>gd', fzf.git_diff,         { desc = "[G]it [D]iff" })
+      vim.keymap.set('n', '<leader>gf', fzf.git_files,        { desc = "[G]it [F]iles" })
+      vim.keymap.set('n', '<leader>gh', fzf.git_hunks,        { desc = "[G]it [H]unks" })
 
       -- LSP keymaps
       vim.keymap.set('n', 'gr', fzf.lsp_references,       { desc = "[G]oto [R]eferences" })
@@ -25,6 +30,7 @@ return {
       vim.keymap.set('n', 'gD', fzf.lsp_typedefs,         { desc = "[G]oto Type[D]ef" })
       vim.keymap.set('n', 'gi', fzf.lsp_implementations,  { desc = "[G]oto [I]mplementations" })
 
+      -- Code
       vim.keymap.set('n', '<leader>ca', fzf.lsp_code_actions,           { desc = "[C]ode [A]ctions" })
       vim.keymap.set('n', '<leader>cci', fzf.lsp_incoming_calls,        { desc = "[C]ode [C]alls [I]ncoming" })
       vim.keymap.set('n', '<leader>cco', fzf.lsp_outgoing_calls,        { desc = "[C]ode [C]alls [O]outgoing" })
