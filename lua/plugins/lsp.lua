@@ -139,6 +139,10 @@ return {
       --  So, we create new capabilities with nvim cmp, and then broadcast that to the servers.
       local capabilities = vim.lsp.protocol.make_client_capabilities()
       capabilities = vim.tbl_deep_extend('force', capabilities, require('cmp_nvim_lsp').default_capabilities())
+      capabilities.textDocument.foldingRange = {
+        dynamicRegistration = false,
+        lineFoldingOnly = true,
+      }
 
       -- Enable the following language servers
       --  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
@@ -149,6 +153,23 @@ return {
       --  - capabilities (table): Override fields in capabilities. Can be used to disable certain LSP features.
       --  - settings (table): Override the default settings passed when initializing the server.
       --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
+      local lua_workspace_library = {}
+      if vim.fn.isdirectory('/usr/share/hypr/stubs') == 1 then
+        table.insert(lua_workspace_library, '/usr/share/hypr/stubs')
+      end
+
+      local lua_root_pattern = require('lspconfig.util').root_pattern(
+        '.luarc.json',
+        '.luarc.jsonc',
+        '.luacheckrc',
+        '.stylua.toml',
+        'stylua.toml',
+        'selene.toml',
+        'selene.yml',
+        '.git'
+      )
+      local hypr_config_dir = vim.fs.normalize(vim.fn.expand '~/.config/hypr')
+
       local servers = {
         -- clangd = {},
         gopls = {},
@@ -167,10 +188,29 @@ return {
           -- cmd = {...},
           -- filetypes = { ...},
           -- capabilities = {},
+          root_dir = function(bufnr, on_dir)
+            local fname = vim.api.nvim_buf_get_name(bufnr)
+            local path = vim.fs.normalize(fname)
+            if path == hypr_config_dir or path:sub(1, #hypr_config_dir + 1) == hypr_config_dir .. '/' then
+              on_dir(hypr_config_dir)
+              return
+            end
+
+            local root = lua_root_pattern(fname)
+            if root then
+              on_dir(root)
+            end
+          end,
           settings = {
             Lua = {
               completion = {
                 callSnippet = 'Replace',
+              },
+              diagnostics = {
+                globals = { 'hl' },
+              },
+              workspace = {
+                library = lua_workspace_library,
               },
               -- You can toggle below to ignore Lua_LS's noisy `missing-fields` warnings
               -- diagnostics = { disable = { 'missing-fields' } },
@@ -195,17 +235,16 @@ return {
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
+      local lsp_servers = vim.tbl_keys(servers or {})
+      for server_name, server in pairs(servers) do
+        -- This handles overriding only values explicitly passed by the server configuration above.
+        server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
+        vim.lsp.config(server_name, server)
+      end
+
       require('mason-lspconfig').setup {
-        handlers = {
-          function(server_name)
-            local server = servers[server_name] or {}
-            -- This handles overriding only values explicitly passed
-            -- by the server configuration above. Useful when disabling
-            -- certain features of an LSP (for example, turning off formatting for ts_ls)
-            server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
-            require('lspconfig')[server_name].setup(server)
-          end,
-        },
+        ensure_installed = lsp_servers,
+        automatic_enable = lsp_servers,
       }
     end,
   },
