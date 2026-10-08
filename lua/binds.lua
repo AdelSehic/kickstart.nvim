@@ -32,5 +32,5 @@ vim.keymap.set('x', '<C-m>', '<cmd>silent! HopWord<CR>', { desc = "Hop to the wo
 
 -- folke/trouble.nvim
 vim.keymap.set('n', '<leader>xx', '<cmd>Trouble diagnostics toggle<CR>', { desc = "Diagnostics toggle "})
-vim.keymap.set('n', '<leader>xX', '<cmd>Buffer diagnostics toggle<CR>', { desc = "Buffer trouble toggle "})
-vim.keymap.set('n', '<leader>xq', '<cmd>Quickfix toggle<CR>', { desc = "Trouble quickfix toggle "})
+vim.keymap.set('n', '<leader>xX', '<cmd>Trouble diagnostics toggle filter.buf=0<CR>', { desc = "Buffer trouble toggle "})
+vim.keymap.set('n', '<leader>xq', '<cmd>Trouble qflist toggle<CR>', { desc = "Trouble quickfix toggle "})

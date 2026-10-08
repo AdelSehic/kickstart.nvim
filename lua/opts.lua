@@ -63,14 +63,30 @@ vim.opt.scrolloff = 14
 
 --Highlight when yanking (copying) text
 --  Try it with `yap` in normal mode
---  See `:help vim.highlight.on_yank()`
+--  See `:help vim.hl.on_yank()`
 vim.api.nvim_create_autocmd('TextYankPost', {
   desc = 'Highlight when yanking (copying) text',
   group = vim.api.nvim_create_augroup('kickstart-highlight-yank', { clear = true }),
   callback = function()
-    vim.highlight.on_yank()
+    vim.hl.on_yank()
   end,
 })
+
+-- [[ Diagnostics ]]
+--  Warnings and below are shown at the end of the line, errors get their own virtual lines.
+--  See `:help vim.diagnostic.Opts`
+vim.diagnostic.config {
+  virtual_text = {
+    severity = {
+      max = vim.diagnostic.severity.WARN,
+    },
+  },
+  virtual_lines = {
+    severity = {
+      min = vim.diagnostic.severity.ERROR,
+    },
+  },
+}
 
 -- Nvim UFO
 vim.o.foldcolumn = '1' -- '0' is not bad

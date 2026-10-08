@@ -1,17 +1,9 @@
-return {
-  {
-    'kndndrj/nvim-dbee',
-    dependencies = {
-      'MunifTanjim/nui.nvim',
-    },
-    build = function()
-      -- Install tries to automatically detect the install method.
-      -- if it fails, try calling it with one of these parameters:
-      --    "curl", "wget", "bitsadmin", "go"
-      require('dbee').install()
-    end,
-    config = function()
-      require('dbee').setup(--[[optional config]])
-    end,
-  },
+-- The dbee binary is installed/updated by the `PackChanged` build hook in `init.lua`.
+--  If it fails, try calling `require('dbee').install()` with one of these parameters:
+--    "curl", "wget", "bitsadmin", "go"
+vim.pack.add {
+  'https://github.com/MunifTanjim/nui.nvim',
+  'https://github.com/kndndrj/nvim-dbee',
 }
+
+require('dbee').setup(--[[optional config]])

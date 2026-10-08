@@ -159,19 +159,8 @@ local evilLua = function()
   ins_left {
     -- Lsp server name .
     function()
-      local msg = 'No Active Lsp'
-      local buf_ft = vim.api.nvim_buf_get_option(0, 'filetype')
-      local clients = vim.lsp.get_active_clients()
-      if next(clients) == nil then
-        return msg
-      end
-      for _, client in ipairs(clients) do
-        local filetypes = client.config.filetypes
-        if filetypes and vim.fn.index(filetypes, buf_ft) ~= -1 then
-          return client.name
-        end
-      end
-      return msg
+      local client = vim.lsp.get_clients({ bufnr = 0 })[1]
+      return client and client.name or 'No Active Lsp'
     end,
     icon = ' LSP:',
     color = { fg = '#ffffff', gui = 'bold' },
@@ -229,10 +218,9 @@ local evilLua = function()
   lualine.setup(config)
 end
 
-return {
-  {
-    'nvim-lualine/lualine.nvim',
-    dependencies = { 'nvim-tree/nvim-web-devicons' },
-    init = evilLua,
-  },
+vim.pack.add {
+  'https://github.com/nvim-tree/nvim-web-devicons',
+  'https://github.com/nvim-lualine/lualine.nvim',
 }
+
+evilLua()

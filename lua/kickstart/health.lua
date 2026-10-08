@@ -12,7 +12,8 @@ local check_version = function()
     return
   end
 
-  if vim.version.ge(vim.version(), '0.10-dev') then
+  -- vim.pack requires Nvim 0.12
+  if vim.version.ge(vim.version(), '0.12') then
     vim.health.ok(string.format("Neovim version is: '%s'", verstr))
   else
     vim.health.error(string.format("Neovim out of date: '%s'. Upgrade to latest stable or nightly", verstr))
@@ -20,8 +21,8 @@ local check_version = function()
 end
 
 local check_external_reqs = function()
-  -- Basic utils: `git`, `make`, `unzip`
-  for _, exe in ipairs { 'git', 'make', 'unzip', 'rg' } do
+  -- Basic utils: `git`, `make`, `unzip`, plus `fzf` for fzf-lua and `curl`, `tar`, `cc` for nvim-treesitter
+  for _, exe in ipairs { 'git', 'make', 'unzip', 'rg', 'fzf', 'curl', 'tar', 'cc' } do
     local is_executable = vim.fn.executable(exe) == 1
     if is_executable then
       vim.health.ok(string.format("Found executable: '%s'", exe))

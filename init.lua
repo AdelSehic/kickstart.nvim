@@ -1,44 +1,59 @@
+-- Enable faster startup by caching compiled Lua modules
+vim.loader.enable()
+
+vim.g.have_nerd_font = true
+
 require 'opts'
 require 'binds'
 require 'user_commands'
 
-vim.g.have_nerd_font = true
+-- [[ Plugins ]]
+--  Plugins are managed by the built-in `vim.pack` plugin manager. See `:help vim.pack`
+--
+--  - Update plugins with `:PackUpdate`, review the changes, then `:write` to apply (or `:quit` to discard)
+--  - Remove plugins that are no longer in the config with `:PackClean`
+--  - Installed revisions are pinned in `nvim-pack-lock.json`, keep it under version control
 
--- [[ Install `lazy.nvim` plugin manager ]]
---    See `:help lazy.nvim.txt` or https://github.com/folke/lazy.nvim for more info
-local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
-if not (vim.uv or vim.loop).fs_stat(lazypath) then
-  local lazyrepo = 'https://github.com/folke/lazy.nvim.git'
-  local out = vim.fn.system { 'git', 'clone', '--filter=blob:none', '--branch=stable', lazyrepo, lazypath }
-  if vim.v.shell_error ~= 0 then
-    error('Error cloning lazy.nvim:\n' .. out)
-  end
-end ---@diagnostic disable-next-line: undefined-field
-vim.opt.rtp:prepend(lazypath)
+-- Build hooks. These must be registered before `vim.pack.add()` installs the plugins.
+--  See `:help vim.pack-events`
+vim.api.nvim_create_autocmd('PackChanged', {
+  group = vim.api.nvim_create_augroup('pack-build-hooks', { clear = true }),
+  callback = function(ev)
+    local name, kind = ev.data.spec.name, ev.data.kind
+    if kind ~= 'install' and kind ~= 'update' then
+      return
+    end
 
-require('lazy').setup({
-  { import = 'plugins' },
-}, {
-  ui = {
-    -- If you are using a Nerd Font: set icons to an empty table which will use the
-    -- default lazy.nvim defined Nerd Font icons, otherwise define a unicode icons table
-    icons = vim.g.have_nerd_font and {} or {
-      cmd = '⌘',
-      config = '🛠',
-      event = '📅',
-      ft = '📂',
-      init = '⚙',
-      keys = '🗝',
-      plugin = '🔌',
-      runtime = '💻',
-      require = '🌙',
-      source = '📄',
-      start = '🚀',
-      task = '📌',
-      lazy = '💤 ',
-    },
-  },
+    if name == 'nvim-treesitter' and kind == 'update' then
+      if not ev.data.active then
+        vim.cmd.packadd 'nvim-treesitter'
+      end
+      vim.cmd 'TSUpdate'
+    elseif name == 'nvim-dbee' then
+      if not ev.data.active then
+        vim.cmd.packadd { 'nvim-dbee', bang = true }
+      end
+      require('dbee').install()
+    end
+  end,
 })
+
+-- Order matters: the colorscheme comes first, mason (in `plugins.lsp`) must be set up
+-- before anything that relies on the tools it installs.
+require 'plugins.ui-plugins'
+require 'plugins.mini-nvim'
+require 'plugins.which-key'
+require 'plugins.gitsigns'
+require 'plugins.fzf'
+require 'plugins.lsp'
+require 'plugins.blink'
+require 'plugins.treesitter'
+require 'plugins.dev-tools'
+require 'plugins.debug'
+require 'plugins.lualine'
+require 'plugins.markdown'
+require 'plugins.neo-tree'
+require 'plugins.dbee'
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
